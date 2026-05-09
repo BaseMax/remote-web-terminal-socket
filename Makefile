@@ -1,4 +1,4 @@
-BINARY   := remote-web-terminal
+BINARY   := remote-web-terminal-socket
 BUILD_DIR := bin
 
 .PHONY: all build run hash clean

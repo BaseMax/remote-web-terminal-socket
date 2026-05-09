@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/basemax/remote-web-terminal/internal/auth"
-	"github.com/basemax/remote-web-terminal/internal/config"
+	"github.com/basemax/remote-web-terminal-socket/internal/auth"
+	"github.com/basemax/remote-web-terminal-socket/internal/config"
 	"golang.org/x/crypto/bcrypt"
 )
 

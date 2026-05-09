@@ -1,7 +1,7 @@
 .env
 bin/
 *.exe
-remote-web-terminal-linux-*
+remote-web-terminal-socket-linux-*
 *.zip
 *.rar
 maxterminal

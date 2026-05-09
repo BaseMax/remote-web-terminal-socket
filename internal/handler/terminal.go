@@ -4,7 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/basemax/remote-web-terminal/internal/auth"
+	"github.com/basemax/remote-web-terminal-socket/internal/auth"
 )
 
 var terminalTmpl = template.Must(template.ParseFiles("web/templates/terminal.html"))

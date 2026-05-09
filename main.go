@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/basemax/remote-web-terminal/internal/auth"
-	"github.com/basemax/remote-web-terminal/internal/config"
-	"github.com/basemax/remote-web-terminal/internal/handler"
+	"github.com/basemax/remote-web-terminal-socket/internal/auth"
+	"github.com/basemax/remote-web-terminal-socket/internal/config"
+	"github.com/basemax/remote-web-terminal-socket/internal/handler"
 )
 
 func main() {
@@ -33,7 +33,7 @@ func main() {
 		addr = ":8080"
 	}
 
-	log.Printf("remote-web-terminal listening on %s", addr)
+	log.Printf("remote-web-terminal-socket listening on %s", addr)
 	if err := http.ListenAndServe(addr, mux); err != nil {
 		log.Fatal(err)
 		os.Exit(1)

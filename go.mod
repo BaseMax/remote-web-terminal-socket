@@ -1,4 +1,4 @@
-module github.com/basemax/remote-web-terminal
+module github.com/basemax/remote-web-terminal-socket
 
 go 1.24.0
 

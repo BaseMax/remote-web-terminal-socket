@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/basemax/remote-web-terminal/internal/config"
-	"github.com/basemax/remote-web-terminal/internal/ptybridge"
+	"github.com/basemax/remote-web-terminal-socket/internal/config"
+	"github.com/basemax/remote-web-terminal-socket/internal/ptybridge"
 	"github.com/gorilla/websocket"
 )
 

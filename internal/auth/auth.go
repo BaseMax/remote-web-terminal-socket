@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/basemax/remote-web-terminal/internal/config"
+	"github.com/basemax/remote-web-terminal-socket/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 
@@ -25,7 +25,7 @@ func IssueToken(cfg *config.Config, username string) (string, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(now),
 			ExpiresAt: jwt.NewNumericDate(now.Add(cfg.SessionDuration)),
-			Issuer:    "remote-web-terminal",
+			Issuer:    "remote-web-terminal-socket",
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
