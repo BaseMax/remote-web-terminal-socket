@@ -116,3 +116,7 @@ Copy `nginx.conf.example` to your nginx config directory. The `/ws` location han
 ├── nginx.conf.example
 └── Makefile
 ```
+
+License MIT
+
+Copyright 2026, Seyyed Ali Mohammadiyeh (MAX BASE)
