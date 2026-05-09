@@ -1,3 +1,7 @@
+// set GOOS=linux
+// set GOARCH=amd64
+// go build -o maxterminal
+// chmod +x maxterminal
 package main
 
 import (
