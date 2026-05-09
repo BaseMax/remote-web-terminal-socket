@@ -1,0 +1,103 @@
+/* ─── Reset & base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ─── Layout ─────────────────────────────────────────────────────── */
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 1rem;
+  background: radial-gradient(ellipse at 50% 0%, #161b22 0%, #0d1117 70%);
+}
+
+.login-box {
+  width: 100%;
+  max-width: 380px;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* ─── Logo ───────────────────────────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 2rem;
+  color: #58a6ff;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.logo svg { flex-shrink: 0; }
+
+/* ─── Alert ──────────────────────────────────────────────────────── */
+.alert {
+  background: #3d1f1f;
+  border: 1px solid #f85149;
+  color: #f85149;
+  border-radius: 6px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ─── Form fields ────────────────────────────────────────────────── */
+.field {
+  margin-bottom: 1.1rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.82rem;
+  color: #8b949e;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+.field input {
+  width: 100%;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  font-size: 0.95rem;
+  padding: 0.55rem 0.75rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.field input:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 3px rgba(88,166,255,0.15);
+}
+
+.field input::placeholder { color: #484f58; }
+
+/* ─── Button ─────────────────────────────────────────────────────── */
+.btn-login {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.65rem;
+  background: #238636;
+  color: #fff;
+  border: 1px solid #2ea043;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.btn-login:hover { background: #2ea043; }
+.btn-login:active { background: #1f7a2f; }

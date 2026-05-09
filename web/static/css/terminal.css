@@ -1,0 +1,122 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #0d1117;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+#topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 38px;
+  padding: 0 1rem;
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+#topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #58a6ff;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+#topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+#topbar-right button,
+#topbar-right a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.12s;
+}
+
+#btn-search {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #8b949e;
+}
+#btn-search:hover { background: #30363d; color: #e6edf3; }
+
+#btn-logout {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #8b949e;
+}
+#btn-logout:hover { background: #3d1f1f; border-color: #f85149; color: #f85149; }
+
+#search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: #161b22;
+  border-bottom: 1px solid #21262d;
+}
+
+#search-bar.hidden { display: none; }
+
+#search-input {
+  flex: 1;
+  max-width: 340px;
+  background: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 5px;
+  color: #e6edf3;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  outline: none;
+}
+#search-input:focus { border-color: #58a6ff; }
+
+#search-bar button {
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: #8b949e;
+  border-radius: 5px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+#search-bar button:hover { background: #30363d; color: #e6edf3; }
+
+#terminal-container {
+  height: calc(100vh - 38px);
+  width: 100%;
+  padding: 4px 0 4px 4px;
+  background: #0d1117;
+}
+
+body.search-visible #terminal-container {
+  height: calc(100vh - 38px - 38px);
+}
+
+.xterm {
+  height: 100%;
+}
+
+.xterm-viewport {
+  background-color: #0d1117 !important;
+}
+
+.xterm-selection div {
+  background: rgba(88, 166, 255, 0.25) !important;
+}

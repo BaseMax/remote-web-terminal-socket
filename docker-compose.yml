@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  terminal:
+    build: .
+    restart: unless-stopped
+    environment:
+      # REQUIRED — change these before deploying
+      JWT_SECRET: "change-me-to-a-long-random-string"
+      # Generate hash with: make hash PASS=yourpassword
+      USERS: "admin:$$2a$$12$$changeme.hash.here"
+      # Optional
+      LISTEN_ADDR: ":8080"
+      SHELL: "/bin/bash"
+      SESSION_DURATION: "8h"
+      COOKIE_SECURE: "true"   # set true when behind HTTPS nginx
+    ports:
+      - "127.0.0.1:8080:8080"   # bind only on localhost; nginx proxies in
+    volumes:
+      - ./web:/app/web:ro
