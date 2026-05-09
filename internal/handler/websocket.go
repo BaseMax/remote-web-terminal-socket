@@ -4,12 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
-	"os/exec"
 	"sync"
 
 	"github.com/basemax/remote-web-terminal/internal/config"
-	"github.com/creack/pty"
+	"github.com/basemax/remote-web-terminal/internal/ptybridge"
 	"github.com/gorilla/websocket"
 )
 
@@ -41,32 +39,21 @@ func WebSocket(cfg *config.Config) http.HandlerFunc {
 		}
 		defer conn.Close()
 
-		shell := cfg.Shell
-		if shell == "" {
-			shell = "/bin/bash"
-		}
-
-		cmd := exec.Command(shell)
-		cmd.Env = append(os.Environ(), "TERM=xterm-256color")
-
-		ptmx, err := pty.Start(cmd)
+		bridge, err := ptybridge.Start(cfg.Shell)
 		if err != nil {
 			log.Printf("ws: pty start error: %v", err)
 			conn.WriteMessage(websocket.TextMessage, []byte("\r\nFailed to start shell: "+err.Error()+"\r\n")) //nolint:errcheck
 			return
 		}
-		defer func() {
-			ptmx.Close()
-			cmd.Process.Kill() //nolint:errcheck
-			cmd.Wait()         //nolint:errcheck
-		}()
+		defer bridge.Close()
 
 		var writeMu sync.Mutex
 
+		// PTY → WebSocket (binary frames)
 		go func() {
 			buf := make([]byte, 4096)
 			for {
-				n, err := ptmx.Read(buf)
+				n, err := bridge.Read(buf)
 				if n > 0 {
 					writeMu.Lock()
 					werr := conn.WriteMessage(websocket.BinaryMessage, buf[:n])
@@ -81,6 +68,7 @@ func WebSocket(cfg *config.Config) http.HandlerFunc {
 			}
 		}()
 
+		// WebSocket → PTY
 		for {
 			msgType, data, err := conn.ReadMessage()
 			if err != nil {
@@ -89,17 +77,14 @@ func WebSocket(cfg *config.Config) http.HandlerFunc {
 
 			switch msgType {
 			case websocket.BinaryMessage:
-				ptmx.Write(data) //nolint:errcheck
+				bridge.Write(data) //nolint:errcheck
 
 			case websocket.TextMessage:
 				var msg resizeMsg
 				if jsonErr := json.Unmarshal(data, &msg); jsonErr == nil && msg.Type == "resize" {
-					pty.Setsize(ptmx, &pty.Winsize{
-						Cols: msg.Cols,
-						Rows: msg.Rows,
-					}) //nolint:errcheck
+					bridge.Resize(msg.Cols, msg.Rows) //nolint:errcheck
 				} else {
-					ptmx.Write(data) //nolint:errcheck
+					bridge.Write(data) //nolint:errcheck
 				}
 			}
 		}

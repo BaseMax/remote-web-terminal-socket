@@ -1,8 +1,10 @@
 package config
 
 import (
+	"bufio"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 )
@@ -23,7 +25,46 @@ type Config struct {
 	CookieSecure bool
 }
 
+// loadDotEnv reads a .env file from the working directory and sets any
+// variables that are not already present in the process environment.
+// It is safe to call even when the file does not exist.
+func loadDotEnv(path string) {
+	f, err := os.Open(path)
+	if err != nil {
+		return // file absent — not an error
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		idx := strings.IndexByte(line, '=')
+		if idx < 1 {
+			continue
+		}
+		key := strings.TrimSpace(line[:idx])
+		val := strings.TrimSpace(line[idx+1:])
+
+		// Strip surrounding single or double quotes
+		if len(val) >= 2 {
+			if (val[0] == '\'' && val[len(val)-1] == '\'') ||
+				(val[0] == '"' && val[len(val)-1] == '"') {
+				val = val[1 : len(val)-1]
+			}
+		}
+
+		// Only set if not already in environment (real env vars take priority)
+		if os.Getenv(key) == "" {
+			os.Setenv(key, val) //nolint:errcheck
+		}
+	}
+}
+
 func Load() *Config {
+	loadDotEnv(".env")
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		log.Fatal("JWT_SECRET environment variable is required")
@@ -36,7 +77,11 @@ func Load() *Config {
 
 	shell := os.Getenv("SHELL")
 	if shell == "" {
-		shell = "/bin/bash"
+		if runtime.GOOS == "windows" {
+			shell = "powershell.exe"
+		} else {
+			shell = "/bin/bash"
+		}
 	}
 
 	sessionDuration := 8 * time.Hour
