@@ -1,5 +1,3 @@
-// hashpw is a small helper that prints a bcrypt hash of the provided password.
-// Usage: go run tools/hashpw/main.go <password>
 package main
 
 import (

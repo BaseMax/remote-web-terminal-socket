@@ -14,16 +14,11 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	// Allow connections from the same origin only.
-	// When behind nginx the Host header is set by nginx, so CheckOrigin
-	// comparing r.Host vs r.Header["Origin"] works correctly.
 	CheckOrigin: func(r *http.Request) bool {
 		origin := r.Header.Get("Origin")
 		if origin == "" {
-			return true // direct (non-browser) client
+			return true
 		}
-		// Accept requests where Origin host matches Host header.
-		// Adjust if your deployment uses a different origin scheme.
 		return r.Header.Get("Origin") == "https://"+r.Host ||
 			r.Header.Get("Origin") == "http://"+r.Host
 	},
@@ -31,14 +26,12 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 4096,
 }
 
-// resizeMsg is sent by the client to resize the PTY.
 type resizeMsg struct {
 	Type string `json:"type"` // "resize"
 	Cols uint16 `json:"cols"`
 	Rows uint16 `json:"rows"`
 }
 
-// WebSocket upgrades the HTTP connection to WebSocket and bridges it to a PTY.
 func WebSocket(cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -70,7 +63,6 @@ func WebSocket(cfg *config.Config) http.HandlerFunc {
 
 		var writeMu sync.Mutex
 
-		// PTY → WebSocket (binary frames)
 		go func() {
 			buf := make([]byte, 4096)
 			for {
@@ -89,7 +81,6 @@ func WebSocket(cfg *config.Config) http.HandlerFunc {
 			}
 		}()
 
-		// WebSocket → PTY
 		for {
 			msgType, data, err := conn.ReadMessage()
 			if err != nil {
@@ -98,11 +89,9 @@ func WebSocket(cfg *config.Config) http.HandlerFunc {
 
 			switch msgType {
 			case websocket.BinaryMessage:
-				// Raw terminal input
 				ptmx.Write(data) //nolint:errcheck
 
 			case websocket.TextMessage:
-				// Control messages (JSON)
 				var msg resizeMsg
 				if jsonErr := json.Unmarshal(data, &msg); jsonErr == nil && msg.Type == "resize" {
 					pty.Setsize(ptmx, &pty.Winsize{
@@ -110,7 +99,6 @@ func WebSocket(cfg *config.Config) http.HandlerFunc {
 						Rows: msg.Rows,
 					}) //nolint:errcheck
 				} else {
-					// Treat as plain text input (fallback)
 					ptmx.Write(data) //nolint:errcheck
 				}
 			}

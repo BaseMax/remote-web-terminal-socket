@@ -9,7 +9,6 @@ import (
 
 var terminalTmpl = template.Must(template.ParseFiles("web/templates/terminal.html"))
 
-// TerminalPage renders the terminal UI page. Requires auth middleware.
 func TerminalPage(w http.ResponseWriter, r *http.Request) {
 	claims := auth.FromContext(r.Context())
 	username := ""

@@ -15,15 +15,12 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// Static assets
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./web/static"))))
 
-	// Public routes
 	mux.HandleFunc("/", handler.LoginPage)
 	mux.HandleFunc("/login", handler.Login(cfg))
 	mux.HandleFunc("/logout", handler.Logout)
 
-	// Protected routes — require valid JWT cookie
 	mux.Handle("/terminal", auth.Middleware(cfg)(http.HandlerFunc(handler.TerminalPage)))
 	mux.Handle("/ws", auth.Middleware(cfg)(http.HandlerFunc(handler.WebSocket(cfg))))
 

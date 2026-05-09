@@ -7,29 +7,19 @@ import (
 	"time"
 )
 
-// Config holds all runtime configuration.
 type Config struct {
-	// HTTP listen address, e.g. ":8080"
 	ListenAddr string
 
-	// JWT signing secret — MUST be set via env var JWT_SECRET
 	JWTSecret []byte
 
-	// Session duration for the JWT cookie
 	SessionDuration time.Duration
 
-	// Allowed credentials: map[username]bcrypt-hashed-password
-	// Populated from env USERNAME / PASSWORD_HASH pairs.
-	// Format: "user1:hash1,user2:hash2"
 	Users map[string]string
 
-	// Shell to spawn in the PTY (default: /bin/bash)
 	Shell string
 
-	// Name of the cookie used to carry the JWT
 	CookieName string
 
-	// Secure flag on the cookie (set true behind HTTPS / nginx)
 	CookieSecure bool
 }
 
@@ -69,7 +59,6 @@ func Load() *Config {
 	}
 }
 
-// parseUsers parses "user1:hash1,user2:hash2" into a map.
 func parseUsers(raw string) map[string]string {
 	m := make(map[string]string)
 	for _, pair := range strings.Split(raw, ",") {

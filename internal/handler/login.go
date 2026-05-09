@@ -13,7 +13,6 @@ import (
 
 var loginTmpl = template.Must(template.ParseFiles("web/templates/login.html"))
 
-// LoginPage renders the login form.
 func LoginPage(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		http.NotFound(w, r)
@@ -22,7 +21,6 @@ func LoginPage(w http.ResponseWriter, r *http.Request) {
 	loginTmpl.Execute(w, nil) //nolint:errcheck
 }
 
-// Login handles form submission, validates credentials, and sets a JWT cookie.
 func Login(cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
@@ -43,10 +41,8 @@ func Login(cfg *config.Config) http.HandlerFunc {
 			return
 		}
 
-		// Constant-time username lookup + bcrypt comparison to prevent timing attacks
 		hash, ok := cfg.Users[username]
 		if !ok {
-			// Perform dummy bcrypt to avoid timing side-channel
 			bcrypt.CompareHashAndPassword([]byte("$2a$12$invalid.hash.padding.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"), []byte(password)) //nolint:errcheck
 			renderLoginError(w, "Invalid username or password.")
 			return
@@ -78,7 +74,6 @@ func Login(cfg *config.Config) http.HandlerFunc {
 	}
 }
 
-// Logout clears the session cookie and redirects to login.
 func Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "rwt_session",

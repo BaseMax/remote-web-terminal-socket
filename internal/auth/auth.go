@@ -13,13 +13,11 @@ type contextKey string
 
 const claimsKey contextKey = "claims"
 
-// Claims is the JWT payload.
 type Claims struct {
 	Username string `json:"username"`
 	jwt.RegisteredClaims
 }
 
-// IssueToken creates a signed JWT for the given user.
 func IssueToken(cfg *config.Config, username string) (string, error) {
 	now := time.Now()
 	claims := &Claims{
@@ -34,7 +32,6 @@ func IssueToken(cfg *config.Config, username string) (string, error) {
 	return token.SignedString(cfg.JWTSecret)
 }
 
-// ParseToken validates a JWT string and returns the claims.
 func ParseToken(cfg *config.Config, tokenStr string) (*Claims, error) {
 	claims := &Claims{}
 	_, err := jwt.ParseWithClaims(tokenStr, claims, func(t *jwt.Token) (interface{}, error) {
@@ -49,8 +46,6 @@ func ParseToken(cfg *config.Config, tokenStr string) (*Claims, error) {
 	return claims, nil
 }
 
-// Middleware returns an http.Handler that enforces JWT authentication via cookie.
-// On failure it redirects to the login page.
 func Middleware(cfg *config.Config) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +57,6 @@ func Middleware(cfg *config.Config) func(http.Handler) http.Handler {
 
 			claims, err := ParseToken(cfg, cookie.Value)
 			if err != nil {
-				// Clear the invalid cookie
 				http.SetCookie(w, expiredCookie(cfg.CookieName, cfg.CookieSecure))
 				redirectToLogin(w, r)
 				return
@@ -74,14 +68,12 @@ func Middleware(cfg *config.Config) func(http.Handler) http.Handler {
 	}
 }
 
-// FromContext retrieves the claims from a request context.
 func FromContext(ctx context.Context) *Claims {
 	c, _ := ctx.Value(claimsKey).(*Claims)
 	return c
 }
 
 func redirectToLogin(w http.ResponseWriter, r *http.Request) {
-	// For WebSocket upgrade requests return 401 instead of redirect
 	if r.Header.Get("Upgrade") == "websocket" {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
