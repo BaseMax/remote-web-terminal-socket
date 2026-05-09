@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/basemax/remote-web-terminal/internal/config"
 	"github.com/basemax/remote-web-terminal/internal/ptybridge"
@@ -42,7 +43,11 @@ func WebSocket(cfg *config.Config) http.HandlerFunc {
 		bridge, err := ptybridge.Start(cfg.Shell)
 		if err != nil {
 			log.Printf("ws: pty start error: %v", err)
-			conn.WriteMessage(websocket.TextMessage, []byte("\r\nFailed to start shell: "+err.Error()+"\r\n")) //nolint:errcheck
+			msg := "\r\n\x1b[31m[ERROR] Failed to start shell (" + cfg.Shell + "): " + err.Error() + "\x1b[0m\r\n"
+			conn.WriteMessage(websocket.BinaryMessage, []byte(msg)) //nolint:errcheck
+			// Hold connection open so xterm can render the error before the
+			// client's reconnect logic fires.
+			time.Sleep(3 * time.Second)
 			return
 		}
 		defer bridge.Close()

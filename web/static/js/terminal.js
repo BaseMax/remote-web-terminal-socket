@@ -125,6 +125,36 @@
     sendResize();
   });
 
+  function copyText(text) {
+    if (!text) return;
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).catch((err) => console.warn('Copy failed:', err));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand('copy'); } catch (e) { console.warn('execCommand copy failed:', e); }
+      document.body.removeChild(ta);
+    }
+  }
+
+  async function pasteText() {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (ws && ws.readyState === WebSocket.OPEN && text)
+          ws.send(new TextEncoder().encode(text));
+      } catch (err) {
+        console.warn('Paste failed:', err);
+      }
+    } else {
+      console.warn('Paste via API unavailable on non-secure origin. Use browser Ctrl+V.');
+    }
+  }
+
   const container = document.getElementById('terminal-container');
 
   container.addEventListener('contextmenu', async (e) => {
@@ -170,24 +200,21 @@
       if (!disabled) {
         item.addEventListener('mouseenter', () => item.style.background = '#21262d');
         item.addEventListener('mouseleave', () => item.style.background = '');
-        item.addEventListener('mousedown', (ev) => { ev.preventDefault(); action(); removeContextMenu(); });
+        item.addEventListener('mousedown', (ev) => {
+          ev.preventDefault();
+          removeContextMenu();
+          try { action(); } catch (e) { console.warn('menu action error:', e); }
+        });
       }
       return item;
     }
 
     menu.appendChild(menuItem('Copy', 'Ctrl+Shift+C', () => {
-      if (selectedText) navigator.clipboard.writeText(selectedText).catch(() => {});
+      copyText(selectedText);
     }, !selectedText));
 
-    menu.appendChild(menuItem('Paste', 'Ctrl+Shift+V', async () => {
-      try {
-        const text = await navigator.clipboard.readText();
-        if (ws && ws.readyState === WebSocket.OPEN && text) {
-          ws.send(new TextEncoder().encode(text));
-        }
-      } catch (err) {
-        console.warn('Paste failed:', err);
-      }
+    menu.appendChild(menuItem('Paste', 'Ctrl+Shift+V', () => {
+      pasteText();
     }, false));
 
     menu.appendChild(menuItem('Select All', 'Ctrl+Shift+A', () => {
@@ -222,21 +249,13 @@
   document.addEventListener('keydown', async (e) => {
     if (e.ctrlKey && e.shiftKey && e.key === 'C') {
       e.preventDefault();
-      const sel = term.getSelection();
-      if (sel) navigator.clipboard.writeText(sel).catch(() => {});
+      copyText(term.getSelection());
       return;
     }
 
     if (e.ctrlKey && e.shiftKey && e.key === 'V') {
       e.preventDefault();
-      try {
-        const text = await navigator.clipboard.readText();
-        if (ws && ws.readyState === WebSocket.OPEN && text) {
-          ws.send(new TextEncoder().encode(text));
-        }
-      } catch (err) {
-        console.warn('Paste failed:', err);
-      }
+      pasteText();
       return;
     }
 
