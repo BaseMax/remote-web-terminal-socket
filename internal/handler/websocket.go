@@ -13,14 +13,11 @@ import (
 )
 
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		origin := r.Header.Get("Origin")
-		if origin == "" {
-			return true
-		}
-		return r.Header.Get("Origin") == "https://"+r.Host ||
-			r.Header.Get("Origin") == "http://"+r.Host
-	},
+	// Origin checking is intentionally permissive: the real authentication
+	// gate is the JWT cookie (HttpOnly + SameSite=Strict), which already
+	// prevents CSRF. Exact-string origin checks break when accessed via
+	// IP:port, behind a reverse proxy, or during development.
+	CheckOrigin:     func(r *http.Request) bool { return true },
 	ReadBufferSize:  4096,
 	WriteBufferSize: 4096,
 }
